@@ -1,0 +1,17 @@
+{
+  "name": "marketplace-manager",
+  "version": "1.0.0",
+  "description": "Create, validate, and manage plugins in Claude Code plugin marketplaces. Includes scaffolding, validation, and documentation generation.",
+  "author": {
+    "name": "Anthropic",
+    "email": "plugins@anthropic.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "marketplace",
+    "plugin-management",
+    "scaffolding",
+    "validation",
+    "development-tools"
+  ]
+}

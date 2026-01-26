@@ -1,0 +1,52 @@
+{
+  "name": "code-plugin-marketplace",
+  "version": "1.0.0",
+  "description": "A curated collection of Claude Code plugins for productivity, development tools, and prompt optimization.",
+  "owner": {
+    "name": "Anthropic",
+    "email": "plugins@anthropic.com"
+  },
+  "repository": "https://github.com/anthropics/claude-code-plugins",
+  "license": "MIT",
+  "plugins": [
+    {
+      "name": "marketplace-manager",
+      "source": "./plugins/marketplace-manager",
+      "description": "Create, validate, and manage plugins in Claude Code plugin marketplaces. Includes scaffolding, validation, and documentation generation.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Anthropic",
+        "email": "plugins@anthropic.com"
+      },
+      "category": "development",
+      "keywords": ["marketplace", "plugin-management", "scaffolding", "validation", "development-tools"],
+      "repository": "https://github.com/anthropics/marketplace-manager"
+    },
+    {
+      "name": "day-week-planner",
+      "source": "./plugins/planner",
+      "description": "Interactive day and week planning with Eisenhower matrix prioritization, time-blocking, and Jira/GitHub integration.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Planning Team",
+        "email": "support@example.com"
+      },
+      "category": "productivity",
+      "keywords": ["planning", "productivity", "scheduling", "eisenhower-matrix", "jira", "github", "time-blocking"],
+      "repository": "https://github.com/yourusername/day-week-planner"
+    },
+    {
+      "name": "prompt-orchestrator",
+      "source": "./plugins/prompt-orchestrator",
+      "description": "Two-tier prompt orchestration: Haiku for discovery/refinement, Sonnet/Opus for execution. Uncovers real problems through Socratic questioning, refines context, and optimizes prompts before expensive model execution. Saves 60-80% on clarification costs.",
+      "version": "2.0.0",
+      "author": {
+        "name": "Engineering Team",
+        "email": "team@example.com"
+      },
+      "category": "development",
+      "keywords": ["prompt-orchestration", "cost-optimization", "model-selection", "quality-assessment"],
+      "repository": "https://github.com/anthropics/prompt-orchestrator"
+    }
+  ]
+}
