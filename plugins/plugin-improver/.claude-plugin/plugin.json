@@ -1,0 +1,21 @@
+{
+  "name": "plugin-improver",
+  "version": "0.1.0",
+  "description": "Iteratively evaluate and enhance plugins with Anthropic best practices. Analyzes quality, suggests concrete improvements, and integrates with Ralph Loop for continuous self-improvement.",
+  "author": {
+    "name": "Plugin Development Team",
+    "email": "support@example.com"
+  },
+  "homepage": "https://github.com/anthropics/claude-code",
+  "repository": "https://github.com/anthropics/claude-code-plugins",
+  "license": "MIT",
+  "keywords": [
+    "plugin-improvement",
+    "quality-assessment",
+    "best-practices",
+    "prompt-optimization",
+    "iterative-enhancement",
+    "plugin-evaluation",
+    "continuous-improvement"
+  ]
+}

@@ -60,6 +60,19 @@
       "category": "development",
       "keywords": ["subagents", "agent-creation", "agent-design", "workflow-automation"],
       "repository": "https://github.com/anthropics/claude-code"
+    },
+    {
+      "name": "plugin-improver",
+      "source": "./plugins/plugin-improver",
+      "description": "Iteratively evaluate and enhance plugins with Anthropic best practices. Analyzes quality, suggests concrete improvements, and integrates with Ralph Loop for continuous self-improvement.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Plugin Development Team",
+        "email": "support@example.com"
+      },
+      "category": "development",
+      "keywords": ["plugin-improvement", "quality-assessment", "best-practices", "prompt-optimization", "iterative-enhancement", "continuous-improvement"],
+      "repository": "https://github.com/anthropics/claude-code-plugins"
     }
   ]
 }
