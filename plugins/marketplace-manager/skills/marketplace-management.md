@@ -1,406 +1,79 @@
-# Marketplace Management Guide
+# Marketplace Management
 
-Expert guidance for managing plugin marketplaces, maintaining quality standards, and coordinating plugin distribution.
+Concise guidance for managing plugin marketplaces. Use validation commands for detailed checks.
 
-## Marketplace Structure
+## Core Concepts
 
-### Directory Layout
-```
-marketplace/
-├── marketplace.json
-├── README.md
-├── plugins/
-│   ├── plugin1/
-│   ├── plugin2/
-│   └── plugin3/
-└── CONTRIBUTING.md (optional)
-```
+**Structure**: `marketplace.json` registry + `plugins/` directory containing plugin subdirectories
+**Location**: Place `marketplace.json` at root or in `.claude-plugin/` directory
+**Validation**: Always run `/validate-marketplace` before releases
 
-### Marketplace Location
-- Central location for all plugin registry
-- One marketplace.json file as source of truth
-- README.md auto-generated or manually maintained
-- Plugin subdirectories contain actual plugin code
+## marketplace.json Quick Reference
 
-## marketplace.json Schema
-
-### Complete Example
 ```json
 {
-  "name": "Claude Code Plugin Marketplace",
-  "version": "1.0.0",
-  "description": "Official marketplace for Claude Code plugins",
-  "owner": {
-    "name": "Anthropic",
-    "email": "plugins@anthropic.com",
-    "url": "https://anthropic.com"
-  },
-  "repository": "https://github.com/anthropics/plugin-marketplace",
-  "license": "MIT",
+  "name": "my-marketplace",
+  "owner": { "name": "...", "email": "..." },
   "plugins": [
     {
-      "name": "my-plugin",
-      "source": "./plugins/my-plugin",
-      "description": "Plugin description",
-      "version": "1.0.0",
-      "author": "Author Name",
-      "category": "development",
-      "keywords": ["tag1", "tag2"],
-      "repository": "https://github.com/author/my-plugin"
+      "name": "plugin-name",
+      "source": "./plugins/plugin-name",
+      "description": "What it does"
     }
   ]
 }
 ```
 
-### Required Root Fields
-- **name** - Marketplace name
-- **owner.name** - Owner name
-- **owner.email** - Contact email
-- **plugins** - Array of plugin entries
+### Required Fields
+- **name**: Marketplace identifier
+- **owner.name** and **owner.email**: Contact info
+- **plugins**: Array with name, source, description per entry
 
-### Optional Root Fields
-- **version** - Marketplace version
-- **description** - Marketplace description
-- **repository** - Repository URL
-- **license** - License type
-- **owner.url** - Owner website
+### Plugin Entry Fields
+| Field | Required | Format |
+|-------|----------|--------|
+| name | Yes | kebab-case |
+| source | Yes | `./path` (local) or URL (remote) |
+| description | Yes | 10-200 chars |
+| version | No | semver X.Y.Z |
+| category | No | see categories below |
+| author | No | `{name, email}` object |
 
-### Required Plugin Fields
-- **name** - Plugin identifier (kebab-case)
-- **source** - Path or URL to plugin
-- **description** - Plugin description
+### Valid Categories
+`development` | `productivity` | `integration` | `testing` | `documentation` | `security` | `devops` | `lsp` | `mcp`
 
-### Optional Plugin Fields
-- **version** - Semantic version
-- **author** - Plugin author name
-- **category** - Plugin category
-- **keywords** - Search tags
-- **repository** - Plugin repository
-- **documentation** - Doc URL
-- **homepage** - Plugin website
+## Common Workflows
 
-## Plugin Entry Formats
-
-### Local Plugin (Relative Path)
-```json
-{
-  "name": "my-plugin",
-  "source": "./plugins/my-plugin",
-  "description": "Local plugin"
-}
-```
-
-### GitHub Plugin
-```json
-{
-  "name": "github-plugin",
-  "source": "https://github.com/user/plugin-name",
-  "description": "Plugin from GitHub"
-}
-```
-
-### Git URL
-```json
-{
-  "name": "git-plugin",
-  "source": "git@github.com:user/plugin-name.git",
-  "description": "Plugin from git repository"
-}
-```
-
-### Absolute Path
-```json
-{
-  "name": "absolute-plugin",
-  "source": "/absolute/path/to/plugin",
-  "description": "Absolute path reference"
-}
-```
-
-## Valid Categories
-
-| Category | Description | Examples |
-|----------|-------------|----------|
-| **development** | Code tools, linters, formatters | prettier-plugin, eslint-integration |
-| **productivity** | Workflow tools, automation | task-runner, batch-processor |
-| **integration** | External service connections | github-integration, jira-connector |
-| **testing** | Test frameworks, QA tools | jest-runner, test-reporter |
-| **documentation** | Doc generation, API docs | swagger-generator, readme-builder |
-| **security** | Security analysis, scanning | dependency-checker, audit-tool |
-| **devops** | CI/CD, deployment | docker-builder, deploy-tool |
-| **lsp** | Language server integration | python-lsp, rust-lsp |
-| **mcp** | Model context protocol servers | custom-mcp-server |
-
-## Adding Plugins
-
-### Basic Steps
-1. Ensure plugin validates with `/validate-plugin`
-2. Add entry to marketplace.json plugins array
-3. Verify entry with `/validate-marketplace`
-4. Update README with `/update-docs`
-5. Commit and push changes
-
-### Entry Checklist
-- ✓ Name is kebab-case and unique
-- ✓ Source path exists and is valid
-- ✓ Description is clear and concise (10-200 chars)
-- ✓ Version follows semver (X.Y.Z)
-- ✓ Category is from valid list
-- ✓ Author name is present
-- ✓ Plugin passes validation
-
-### Validation Before Adding
+### Add Plugin
 ```bash
-# Validate plugin structure
-/validate-plugin ./plugins/my-plugin
-
-# Add to marketplace
-/add-to-marketplace ./plugins/my-plugin
-
-# Verify marketplace integrity
-/validate-marketplace . --deep
+/validate-plugin ./plugins/new-plugin    # Validate first
+/add-to-marketplace ./plugins/new-plugin # Add entry
+/validate-marketplace --deep             # Verify
 ```
 
-## Updating Plugins
+### Release Checklist
+1. All plugins pass `/validate-plugin`
+2. Marketplace passes `/validate-marketplace --deep`
+3. README.md is current
+4. Version bumped if changed
 
-### Version Updates
-1. Update version in plugin's plugin.json
-2. Update version in marketplace.json entry
-3. Run `/validate-marketplace`
-4. Regenerate docs with `/update-docs`
-5. Commit changes
+## Quick Fixes
 
-### Metadata Changes
-1. Edit marketplace.json entry
-2. Update plugin's plugin.json if needed
-3. Run `/validate-marketplace`
-4. Update docs if description changed
-5. Commit changes
+**"marketplace.json not found"**
+→ Ensure file exists at root or `.claude-plugin/marketplace.json`
 
-### Removing Plugins
-1. Remove entry from marketplace.json
-2. Optionally delete plugin directory
-3. Run `/validate-marketplace`
-4. Update docs with `/update-docs`
-5. Commit changes
+**"Plugin name not kebab-case"**
+→ Use lowercase-with-hyphens: `my-plugin` not `MyPlugin`
 
-## Documentation Management
+**"Source path not found"**
+→ Local paths must start with `./` and exist
 
-### README.md Generation
-Auto-generated by `/update-docs`:
-- Marketplace header and owner
-- Plugin table with all entries
-- Installation instructions
-- Per-plugin sections
-- Contributing guidelines
+**"Duplicate plugin name"**
+→ Each name must be unique in plugins array
 
-### Manual Sections to Keep
-- Introduction and features
-- Getting started guide
-- Custom sections
-- Contributing rules
-- Community information
-
-### Documentation Structure
-```markdown
-# Marketplace Name
-
-Brief description
-
-## Installation
-
-Installation instructions
-
-## Available Plugins
-
-Plugin table (auto-generated)
-
-## Plugin Details
-
-Individual plugin sections (auto-generated)
-
-## Contributing
-
-Contribution guidelines
-
-## License
-
-License information
-```
-
-## Quality Standards
-
-### Structure Requirements
-- ✓ Valid JSON in marketplace.json
-- ✓ All required fields present
-- ✓ Consistent naming conventions
-- ✓ No duplicate names
-- ✓ All sources exist
-
-### Plugin Requirements
-- ✓ Passes `/validate-plugin`
-- ✓ Has plugin.json with required fields
-- ✓ Has at least one component
-- ✓ Has README.md
-- ✓ Follows naming conventions
-
-### Documentation Requirements
-- ✓ Marketplace README up-to-date
-- ✓ All plugins documented
-- ✓ Clear installation instructions
-- ✓ Contributing guidelines
-- ✓ License specified
-
-## Best Practices
-
-### Organization
-✓ Group related plugins by category
-✓ Keep marketplace.json organized
-✓ Use consistent entry formatting
-✓ Maintain clear directory structure
-✓ Document marketplace policies
-
-### Governance
-✓ Establish quality standards
-✓ Review new submissions
-✓ Maintain version consistency
-✓ Plan release cycles
-✓ Track changelog
-
-### Security
-✓ Verify plugin sources
-✓ Check for vulnerabilities
-✓ Validate dependencies
-✓ Review permissions
-✓ Audit regularly
-
-### Community
-✓ Encourage contributions
-✓ Respond to issues promptly
-✓ Share best practices
-✓ Highlight quality plugins
-✓ Foster collaboration
-
-## Release Management
-
-### Pre-Release Checklist
-- ✓ All plugins validated
-- ✓ marketplace.json verified
-- ✓ README current
-- ✓ CHANGELOG updated
-- ✓ Version bumped
-- ✓ Tests passing
-
-### Release Process
-1. Validate entire marketplace with `/validate-marketplace --deep`
-2. Update marketplace version in marketplace.json
-3. Generate release notes
-4. Update CHANGELOG.md
-5. Create git tag
-6. Push to repository
-7. Announce release
-
-### Versioning
-- Follow semantic versioning for marketplace
-- Track marketplace version separately from plugins
-- Document compatibility requirements
-- Plan version upgrades
-
-## Monitoring and Maintenance
-
-### Regular Tasks
-- Weekly: Check for plugin updates
-- Monthly: Validate entire marketplace
-- Quarterly: Review and update documentation
-- Annually: Audit marketplace health
-
-### Health Checks
-- Are all plugin sources accessible?
-- Do all plugins still validate?
-- Is documentation current?
-- Are there security issues?
-- What's the plugin quality trend?
-
-### Metrics to Track
-- Number of plugins
-- Plugin categories distribution
-- Average plugin quality score
-- Community engagement
-- Download/usage statistics
-
-## Marketplace Migration
-
-### Moving to New Location
-1. Create new marketplace structure
-2. Copy valid plugins
-3. Update marketplace.json
-4. Run deep validation
-5. Update documentation
-6. Migrate users and documentation
-
-### Merging Marketplaces
-1. Combine marketplace.json entries
-2. Check for name conflicts
-3. Resolve duplicates
-4. Validate combined marketplace
-5. Update documentation
-6. Test thoroughly
-
-## Common Issues
-
-### Invalid source paths
-- Verify relative paths are correct
-- Check for typos in paths
-- Ensure plugin directories exist
-- Test local paths work
-
-### Version mismatches
-- plugin.json version should match marketplace
-- Use semantic versioning consistently
-- Update both locations when changing
-
-### Duplicate names
-- Search marketplace for existing names
-- Use unique descriptive names
-- Check case sensitivity
-- Avoid generic names
-
-### Documentation sync issues
-- Run `/update-docs` after changes
-- Check README manually
-- Verify all plugins listed
-- Test links and references
-
-## Tools and Commands
-
-### Useful Commands
-```bash
-/validate-plugin <plugin-path>
-/add-to-marketplace <plugin-path>
-/validate-marketplace . --deep
-/list-plugins . --format json
-/update-docs
-```
-
-### Shell Commands
-```bash
-# Check marketplace structure
-find . -name "plugin.json" -type f
-
-# List all plugins
-ls plugins/
-
-# Validate JSON
-jq . marketplace.json
-
-# Count plugins
-jq '.plugins | length' marketplace.json
-```
-
-## Resources
-
-- Marketplace specifications
-- Plugin authoring guide
-- Quality standards documentation
-- Community guidelines
-- Official examples
+## Commands Reference
+- `/validate-marketplace [path] [--deep]` - Check marketplace integrity
+- `/validate-plugin <path>` - Check single plugin
+- `/add-to-marketplace <path>` - Add plugin entry
+- `/list-plugins [--format json|table]` - List all plugins
+- `/update-docs` - Regenerate README

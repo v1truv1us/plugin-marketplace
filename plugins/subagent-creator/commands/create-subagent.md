@@ -1,187 +1,72 @@
 ---
 name: create-subagent
-description: Interactive wizard for creating custom Claude Code subagents with design validation and recommendations
-argument-hint: "[optional: brief description of what the subagent should do]"
+description: Create custom subagents with guided design validation
+argument-hint: "[optional: subagent purpose]"
 allowed-tools: AskUserQuestion, Write
 ---
 
 # Create a Custom Subagent
 
-You are guiding the user through an interactive subagent creation workflow. Your role is to:
-
-1. Understand what the subagent needs to do
-2. Gather detailed requirements through a linear questionnaire
-3. Check for existing/suitable subagents
-4. Delegate to the subagent-architect agent for design and validation
-5. Generate the final subagent file
+Guide the user through subagent creation by gathering requirements and delegating to the subagent-architect.
 
 ## Workflow
 
-### Step 1: Understand the Need (if not provided)
+### Step 1: Understand the Need
 
-If the user provided a brief description, use it. Otherwise, ask:
+If the user provided a description, use it. Otherwise ask:
+> What would you like this subagent to do?
 
-> What would you like this subagent to do? (Brief description of its purpose)
+### Step 2: Gather Requirements
 
-Capture their response.
+Ask these questions in sequence:
 
-### Step 2: Gather Requirements via Linear Questionnaire
+1. **Triggers:** "When should Claude delegate to this subagent?"
+2. **Responsibilities:** "What are the 2-3 main tasks?"
+3. **Tool access:** "Modify files (Edit), create files (Write), run commands (Bash), or read-only?"
+4. **Model:** "Fast (Haiku), balanced (Sonnet), capable (Opus), or inherit?"
+5. **Constraints:** "Any special requirements?"
 
-Ask these questions in order, capturing responses:
-
-**Question 1 - When should it be used?**
-> When should Claude delegate to this subagent? What specific tasks/requests should trigger it?
-
-**Question 2 - What should it do?**
-> What are the 2-3 main responsibilities? What's its core expertise?
-
-**Question 3 - Tool access needs:**
-> Does this subagent need to modify files (Edit), create new files (Write), run commands (Bash), or just read (Read-only)?
-
-**Question 4 - Model preference:**
-> Should it use a fast model (Haiku), balanced (Sonnet), or most capable (Opus)? Or inherit from parent?
-
-**Question 5 - Any additional constraints?**
-> Any special requirements (permission mode, specific skills, edge cases)?
-
-After gathering responses, summarize:
-
+Summarize and confirm:
 ```
-You've described a subagent that:
+Your subagent will:
 - Purpose: [Summary]
 - Triggers: [When to use]
-- Responsibilities: [Main tasks]
-- Tool access: [Required tools]
+- Tools: [Access level]
 - Model: [Choice]
-- Additional: [Any special needs]
 ```
 
-Ask: "Does this look correct?" and gather confirmation or adjustments.
+### Step 3: Validate Requirements
 
-### Step 3: Check for Existing Subagents
+Invoke the **subagent-architect** with all gathered requirements. The architect will:
+- Check if existing subagents meet the need
+- Validate the design completeness
+- Recommend model, tools, and permissions
+- Generate production-ready implementation
 
-Based on their requirements, ask the subagent-architect agent to:
+If the architect recommends an existing subagent, guide the user on using it.
 
-1. Check if existing Claude Code built-in subagents (Explore, Plan, general-purpose) could serve this need
-2. Recommend if an existing subagent would be better than creating a new one
-3. If yes, explain why and how to use the existing subagent
-4. If no, confirm it warrants a new subagent
+### Step 4: Save and Finalize
 
-Use this prompt:
+Present the generated file and offer to save:
+- Project-level: `.claude/agents/subagent-name.md`
+- User-level: `~/.claude/agents/subagent-name.md`
 
-> Check if existing Claude Code subagents (Explore, Plan, general-purpose) or common patterns already meet this need:
->
-> **Requirement:** [User's description]
->
-> **Main use case:** [When to use]
->
-> **Tool access needed:** [Tools]
->
-> Should we recommend using an existing subagent, or create a new one?
-
-If user accepts recommendation for existing subagent, provide guidance on how to use it and end here.
-
-### Step 4: Generate Subagent Implementation
-
-If a new subagent is warranted, invoke the subagent-architect agent to:
-
-1. Validate the requirements are complete
-2. Recommend specific models, tools, and permission modes
-3. Generate a production-ready subagent markdown file with:
-   - Proper YAML frontmatter (name, description, model, color, tools, etc.)
-   - Complete system prompt with role, responsibilities, process, output format
-
-Use this prompt:
-
-> Use the subagent-architect to design and generate a subagent based on these specifications:
->
-> **Purpose:** [User's description]
-> **Triggers:** [When to use]
-> **Main responsibilities:** [2-3 key responsibilities]
-> **Tool access:** [Required tools]
-> **Model:** [User's choice]
-> **Additional requirements:** [Any special needs]
->
-> Please:
-> 1. Validate the design is complete
-> 2. Recommend any improvements
-> 3. Check if existing subagents could work instead
-> 4. Generate the complete subagent markdown file ready to save
-
-### Step 5: Save and Finalize
-
-Present the generated subagent file to the user and ask:
-
-> I've generated your subagent. You can save this to `.claude/agents/subagent-name.md` in your project, or `~/.claude/agents/subagent-name.md` to share across all projects.
->
-> Would you like me to save it now, or would you like to review/edit it first?
-
-If saving:
-- Use Write tool to create the file at the requested location
-- Confirm successful creation
-
-If reviewing/editing:
-- Provide the full file content
-- Ask what changes they'd like
-- Make adjustments
-- Offer to save
-
-### Step 6: Provide Guidance
-
-After saving, provide:
-
+After saving:
 > **Next steps:**
-> 1. Your subagent is ready to use immediately (no restart needed)
-> 2. To test it, ask questions that should trigger it
-> 3. You can edit the subagent file anytime to refine behavior
-> 4. For design patterns and best practices, use the "Subagent Design Patterns" skill
-> 5. For implementation details, use the "Subagent Implementation" skill
+> 1. Your subagent is ready immediately (no restart)
+> 2. Test by asking questions that should trigger it
+> 3. Edit the file anytime to refine behavior
 
-## Important Guidelines
+## Guidelines
 
-**For gathering requirements:**
 - Ask one question at a time
-- Keep questions concise and specific
-- Capture exact responses
-- Summarize before moving forward
+- Summarize before proceeding
+- Trust the subagent-architect for design and validation
+- Default to project-level storage
+- Use kebab-case naming (e.g., `code-reviewer`)
 
-**For generating subagents:**
-- Always use the subagent-architect agent
-- It will validate, recommend, and generate
-- Do not manually create subagents—trust the architect
+## Handling Issues
 
-**For file paths:**
-- `.claude/agents/` for project-level subagents (team/project specific)
-- `~/.claude/agents/` for user-level subagents (personal, all projects)
-- Default to project-level unless user requests user-level
-
-**For naming:**
-- Use kebab-case (lowercase with hyphens)
-- Be descriptive but concise
-- Example: `code-reviewer`, `api-test-generator`
-
-## Handling Interruptions
-
-If the user interrupts or changes direction:
-
-- **"Never mind"** - Discard current work, ask if they want to start over
-- **"Let me add..."** - Accept the addition, incorporate it
-- **"I'm not sure about..."** - Clarify that specific point, continue
-- **"Go back to question X"** - Return to that question, adjust
-
-## Error Handling
-
-**If requirements are unclear:**
-> That's not quite clear. Let me rephrase to make sure I understand:
-> [Your interpretation]
->
-> Is that right?
-
-**If requirements seem contradictory:**
-> I notice [X] might conflict with [Y]. Should we:
-> - Option A: [Resolve one way]
-> - Option B: [Resolve another way]
-> - Let me think about this differently?
-
-**If the need doesn't warrant a subagent:**
-> Based on your description, I think this might work better as a [main conversation / skill / command] because [reason]. Would you like to explore that instead, or proceed with creating a subagent anyway?
+**Unclear requirements:** Rephrase and confirm understanding
+**Contradictions:** Present options to resolve
+**Not suited for subagent:** Suggest alternatives (skill, command, main conversation)

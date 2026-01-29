@@ -1,330 +1,122 @@
-# Plugin Authoring Guide
+# Plugin Authoring
 
-Expert guidance for creating high-quality Claude Code plugins following official conventions and best practices.
+Concise guidance for creating Claude Code plugins. Use `/create-plugin` for scaffolding.
 
-## Plugin Structure Standards
+## Plugin Structure
 
-### Directory Layout
 ```
 my-plugin/
-├── .claude-plugins/
-│   └── my-plugin/
-│       ├── plugin.json
-│       ├── commands/
-│       ├── agents/
-│       ├── skills/
-│       ├── hooks/
-│       ├── scripts/
-│       └── README.md
+├── .claude-plugin/
+│   ├── plugin.json    # Required manifest
+│   ├── commands/      # Slash commands (*.md)
+│   ├── agents/        # AI agents (*.md)
+│   ├── skills/        # Ambient skills (*.md)
+│   ├── hooks/         # Event hooks (*.md)
+│   ├── .mcp.json      # MCP server config
+│   └── README.md      # Required documentation
 └── LICENSE
 ```
 
-### .claude-plugins Directory
-All plugin components live under `.claude-plugins/{plugin-name}/`:
-- **plugin.json** - Plugin manifest (required)
-- **commands/** - Slash commands (optional)
-- **agents/** - AI agents (optional)
-- **skills/** - Ambient skills (optional)
-- **hooks/** - Event-driven hooks (optional)
-- **.mcp.json** - MCP server config (optional)
-- **scripts/** - Utility scripts (optional)
-- **README.md** - Plugin documentation (required)
+**Note**: Use `.claude-plugin/` (singular), not `.claude-plugins/`
 
-## Plugin.json Template
+## plugin.json Template
 
 ```json
 {
   "name": "my-plugin",
   "version": "1.0.0",
-  "description": "Brief description of what the plugin does",
+  "description": "Brief description (10-200 chars)",
+  "author": { "name": "Your Name", "email": "you@email.com" },
   "category": "development",
-  "author": {
-    "name": "Your Name",
-    "email": "your@email.com"
-  },
-  "license": "MIT",
-  "keywords": ["tag1", "tag2", "tag3"],
-  "components": {
-    "commands": ["command1", "command2"],
-    "agents": ["agent1"],
-    "skills": ["skill1"]
-  }
+  "license": "MIT"
 }
 ```
 
 ### Required Fields
-- **name** - Plugin identifier in kebab-case
-- **version** - Semantic version (X.Y.Z)
-- **description** - 10-200 character description
-
-### Optional Fields
-- **category** - Plugin category
-- **author** - Author name and email
-- **license** - License type (MIT recommended)
-- **keywords** - Search tags
-- **components** - Component references
+- **name**: kebab-case identifier
+- **version**: semver format X.Y.Z
+- **description**: 10-200 characters
 
 ## Naming Conventions
 
-### Plugin Names
-- Format: kebab-case (lowercase, hyphens only)
-- Examples: `my-plugin`, `awesome-tool`, `code-formatter`
-- Invalid: `MyPlugin`, `my_plugin`, `MY-PLUGIN`
+**Everything uses kebab-case**: lowercase letters and hyphens only
 
-### Command Names
-- Format: kebab-case
-- Examples: `create-file`, `validate-code`, `run-tests`
-- Prefix with category for related commands: `doc-generate`, `doc-validate`
-
-### Agent Names
-- Format: kebab-case, descriptive of function
-- Examples: `code-reviewer`, `bug-finder`, `refactor-helper`
-
-### Skill Names
-- Format: kebab-case
-- Describe the expertise provided
-- Examples: `python-best-practices`, `api-design-guidance`
+| Component | Valid | Invalid |
+|-----------|-------|---------|
+| Plugin | `my-plugin` | `MyPlugin`, `my_plugin` |
+| Command | `run-tests` | `runTests`, `run_tests` |
+| Agent | `code-reviewer` | `CodeReviewer` |
+| Skill | `best-practices` | `bestPractices` |
 
 ## Component Templates
 
-### Command Template (Slash Commands)
+### Command (commands/my-command.md)
 ```markdown
 ---
-name: command-name
+name: my-command
 description: What this command does
 args:
-  - name: arg1
+  - name: input
     type: string
     required: true
-    description: Description of argument
-  - name: arg2
-    type: boolean
-    required: false
-    description: Optional flag description
+    description: Input description
 ---
 
-# Command Name
+# My Command
 
-Brief description of what the command does.
-
-## Usage
-
-```bash
-/command-name value --flag
+Brief description and usage instructions.
 ```
 
-## Examples
-
-Real-world usage examples.
-
-## Output
-
-Description of what the command produces.
-```
-
-### Agent Template (AI Agents)
+### Agent (agents/my-agent.md)
 ```markdown
 ---
-name: agent-name
+name: my-agent
 description: What this agent does
 model: sonnet
 tools: [Read, Glob, Grep]
-color: blue
 ---
 
-# Agent Name
+# My Agent
 
-**Purpose:** Clear statement of agent's role
+Purpose: Clear statement of role
 
-**Capabilities:**
-- What the agent can do
-- Key features
-- Special abilities
+When to use: Key use cases
 
-**When to Use:**
-- Use case 1
-- Use case 2
-
-**Input:**
-What the agent expects to receive
-
-**Output:**
-What the agent produces
+Output: What it produces
 ```
 
-### Skill Template (Ambient Skills)
+### Skill (skills/my-skill.md)
 ```markdown
-# Skill Name
+# My Skill
 
-**Purpose:** What expertise this skill provides
+Purpose: What expertise this provides
 
-**When Applied:** When agent or user would benefit
-
-**Key Guidance:**
-
-1. **Topic 1**
-   - Key point
-   - Best practice
-   - Common pitfall
-
-2. **Topic 2**
-   - Guidance and examples
-
-3. **Implementation Tips**
-   - Practical advice
-   - Code patterns
-   - Tools to use
+## Key Guidance
+- Essential point 1
+- Essential point 2
+- Essential point 3
 ```
 
-## Best Practices
+## Valid Categories
+`development` | `productivity` | `integration` | `testing` | `documentation` | `security` | `devops` | `lsp` | `mcp`
 
-### Structure
-✓ Keep components focused and single-purpose
-✓ Organize related commands into logical groups
-✓ Use clear, descriptive names
-✓ Document every component thoroughly
+## Version Rules (semver)
+- **Major (X.0.0)**: Breaking changes
+- **Minor (0.X.0)**: New features, backward compatible
+- **Patch (0.0.X)**: Bug fixes
 
-### Documentation
-✓ Write README.md first (helps clarify purpose)
-✓ Include clear usage examples
-✓ Document all arguments and options
-✓ Provide troubleshooting section
-✓ Link components together
+## Publishing Checklist
 
-### Code Quality
-✓ Keep scripts simple and focused
-✓ Use consistent formatting
-✓ Add comments for complex logic
-✓ Handle errors gracefully
-✓ Validate inputs
+1. `/validate-plugin ./my-plugin` passes
+2. README.md has usage examples
+3. All components have descriptions
+4. Version follows semver
+5. Category is valid
 
-### Security
-✓ Validate all user inputs
-✓ Use safe default configurations
-✓ Don't hardcode secrets or credentials
-✓ Document security considerations
-✓ Follow principle of least privilege
+## Common Mistakes
 
-### Performance
-✓ Keep commands responsive
-✓ Use appropriate caching
-✓ Avoid expensive operations
-✓ Stream output for long operations
-✓ Provide progress indicators
-
-## Version Control
-
-### Semantic Versioning (X.Y.Z)
-- **X** (Major) - Breaking changes
-- **Y** (Minor) - New features, backward compatible
-- **Z** (Patch) - Bug fixes
-
-Examples:
-- 0.1.0 - Initial release
-- 1.0.0 - First stable release
-- 1.1.0 - New feature added
-- 1.1.1 - Bug fix
-
-## Categories
-
-Classify your plugin with one of these:
-
-| Category | Use Cases |
-|----------|-----------|
-| **development** | Code writing, testing, debugging tools |
-| **productivity** | Workflow enhancement, automation |
-| **integration** | External service connections |
-| **testing** | Testing frameworks, QA tools |
-| **documentation** | Doc generation, API documentation |
-| **security** | Security analysis, vulnerability scanning |
-| **devops** | CI/CD, deployment, infrastructure |
-| **lsp** | Language server integrations |
-| **mcp** | Model context protocol servers |
-
-## README.md Structure
-
-```markdown
-# Plugin Name
-
-Brief one-line description.
-
-## Installation
-
-How to install the plugin.
-
-## Quick Start
-
-Simple example to get started.
-
-## Commands
-
-List all commands with descriptions.
-
-## Agents
-
-Describe agent capabilities.
-
-## Skills
-
-Describe ambient skills.
-
-## Configuration
-
-Configuration options if any.
-
-## Examples
-
-Real-world usage examples.
-
-## Troubleshooting
-
-Common issues and solutions.
-
-## Contributing
-
-How others can contribute.
-
-## License
-
-License information.
-```
-
-## Testing Your Plugin
-
-Before releasing:
-1. Validate with `/validate-plugin`
-2. Test all commands work correctly
-3. Test agents with various inputs
-4. Check documentation for accuracy
-5. Verify file structure is correct
-6. Get feedback from others
-
-## Publishing to Marketplace
-
-1. Ensure plugin passes `/validate-plugin`
-2. Create marketplace.json entry
-3. Run `/add-to-marketplace`
-4. Update documentation with `/update-docs`
-5. Get marketplace validated with `/validate-marketplace`
-6. Commit and push changes
-7. Share marketplace URL
-
-## Common Mistakes to Avoid
-
-❌ Using uppercase or underscores in names
-❌ Inconsistent command naming
-❌ Missing documentation
-❌ No error handling
-❌ Hardcoded paths or credentials
-❌ Not following component conventions
-❌ Unclear descriptions
-❌ Missing component templates
-❌ Version mismatch between plugin.json and marketplace
-❌ Incomplete README.md
-
-## Resources
-
-- Official Claude Code documentation
-- Plugin marketplace examples
-- Community plugin repository
-- Best practices guide
+- Using `.claude-plugins/` instead of `.claude-plugin/`
+- CamelCase or snake_case names
+- Missing required fields in plugin.json
+- No README.md
+- Description too short/long (need 10-200 chars)

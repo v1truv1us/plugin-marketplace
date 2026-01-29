@@ -52,27 +52,36 @@ validate_directory_structure() {
         return 1
     fi
 
-    # Check for .claude-plugins directory
-    if [ ! -d "$PLUGIN_PATH/.claude-plugins" ]; then
-        print_error ".claude-plugins directory not found"
+    # Check for plugin directory - support both structures:
+    # 1. .claude-plugin/ (singular - official Claude Code convention)
+    # 2. Root plugin.json (flat structure for simple plugins)
+    if [ -d "$PLUGIN_PATH/.claude-plugin" ]; then
+        PLUGIN_DIR="$PLUGIN_PATH/.claude-plugin"
+        print_check ".claude-plugin directory exists"
+    elif [ -f "$PLUGIN_PATH/plugin.json" ]; then
+        PLUGIN_DIR="$PLUGIN_PATH"
+        print_check "Root plugin structure detected"
+    else
+        print_error "No valid plugin structure found (expected .claude-plugin/ or plugin.json at root)"
         return 1
     fi
 
-    print_check ".claude-plugins directory exists"
-
     # Check for plugin.json
-    if [ ! -f "$PLUGIN_PATH/.claude-plugins/plugin.json" ]; then
-        print_error "plugin.json not found in .claude-plugins/"
+    if [ ! -f "$PLUGIN_DIR/plugin.json" ]; then
+        print_error "plugin.json not found"
         return 1
     fi
 
     print_check "plugin.json file exists"
+
+    # Export for use in other functions
+    export PLUGIN_DIR
 }
 
 validate_plugin_json() {
     print_header "Plugin Manifest (plugin.json)"
 
-    MANIFEST="$PLUGIN_PATH/.claude-plugins/plugin.json"
+    MANIFEST="$PLUGIN_DIR/plugin.json"
 
     # Check if valid JSON
     if ! jq empty "$MANIFEST" 2>/dev/null; then
@@ -148,8 +157,8 @@ validate_components() {
     COMPONENTS_FOUND=0
 
     # Check for commands directory
-    if [ -d "$PLUGIN_PATH/.claude-plugins/commands" ]; then
-        COMMAND_COUNT=$(find "$PLUGIN_PATH/.claude-plugins/commands" -name "*.md" 2>/dev/null | wc -l)
+    if [ -d "$PLUGIN_DIR/commands" ]; then
+        COMMAND_COUNT=$(find "$PLUGIN_DIR/commands" -name "*.md" 2>/dev/null | wc -l)
         if [ "$COMMAND_COUNT" -gt 0 ]; then
             print_check "Commands found: $COMMAND_COUNT"
             ((COMPONENTS_FOUND++))
@@ -157,8 +166,8 @@ validate_components() {
     fi
 
     # Check for agents directory
-    if [ -d "$PLUGIN_PATH/.claude-plugins/agents" ]; then
-        AGENT_COUNT=$(find "$PLUGIN_PATH/.claude-plugins/agents" -name "*.md" 2>/dev/null | wc -l)
+    if [ -d "$PLUGIN_DIR/agents" ]; then
+        AGENT_COUNT=$(find "$PLUGIN_DIR/agents" -name "*.md" 2>/dev/null | wc -l)
         if [ "$AGENT_COUNT" -gt 0 ]; then
             print_check "Agents found: $AGENT_COUNT"
             ((COMPONENTS_FOUND++))
@@ -166,8 +175,8 @@ validate_components() {
     fi
 
     # Check for skills directory
-    if [ -d "$PLUGIN_PATH/.claude-plugins/skills" ]; then
-        SKILL_COUNT=$(find "$PLUGIN_PATH/.claude-plugins/skills" -name "*.md" 2>/dev/null | wc -l)
+    if [ -d "$PLUGIN_DIR/skills" ]; then
+        SKILL_COUNT=$(find "$PLUGIN_DIR/skills" -name "*.md" 2>/dev/null | wc -l)
         if [ "$SKILL_COUNT" -gt 0 ]; then
             print_check "Skills found: $SKILL_COUNT"
             ((COMPONENTS_FOUND++))
@@ -175,8 +184,8 @@ validate_components() {
     fi
 
     # Check for hooks
-    if [ -d "$PLUGIN_PATH/.claude-plugins/hooks" ]; then
-        HOOK_COUNT=$(find "$PLUGIN_PATH/.claude-plugins/hooks" -type f 2>/dev/null | wc -l)
+    if [ -d "$PLUGIN_DIR/hooks" ]; then
+        HOOK_COUNT=$(find "$PLUGIN_DIR/hooks" -type f 2>/dev/null | wc -l)
         if [ "$HOOK_COUNT" -gt 0 ]; then
             print_check "Hooks found: $HOOK_COUNT"
             ((COMPONENTS_FOUND++))
@@ -184,7 +193,7 @@ validate_components() {
     fi
 
     # Check for MCP config
-    if [ -f "$PLUGIN_PATH/.claude-plugins/.mcp.json" ]; then
+    if [ -f "$PLUGIN_DIR/.mcp.json" ]; then
         print_check "MCP server configured"
         ((COMPONENTS_FOUND++))
     fi
@@ -201,22 +210,19 @@ validate_components() {
 validate_documentation() {
     print_header "Documentation"
 
-    # Check README.md
-    if [ ! -f "$PLUGIN_PATH/.claude-plugins/README.md" ]; then
-        if [ ! -f "$PLUGIN_PATH/README.md" ]; then
-            print_error "README.md not found"
-            return 1
-        fi
+    # Check README.md - look in plugin dir, then root
+    if [ -f "$PLUGIN_DIR/README.md" ]; then
+        README_FILE="$PLUGIN_DIR/README.md"
+    elif [ -f "$PLUGIN_PATH/README.md" ]; then
+        README_FILE="$PLUGIN_PATH/README.md"
+    else
+        print_error "README.md not found"
+        return 1
     fi
 
     print_check "README.md found"
 
     # Check README content
-    README_FILE="$PLUGIN_PATH/.claude-plugins/README.md"
-    if [ ! -f "$README_FILE" ]; then
-        README_FILE="$PLUGIN_PATH/README.md"
-    fi
-
     if grep -q "Usage\|Example\|Install" "$README_FILE" 2>/dev/null; then
         print_check "README contains usage information"
     else
