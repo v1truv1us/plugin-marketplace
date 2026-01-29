@@ -1,29 +1,43 @@
 {
+  "name": "code-plugin-marketplace",
   "version": "1.0.0",
   "description": "Claude Code Plugin Marketplace",
+  "owner": {
+    "name": "Claude Code Team",
+    "email": "plugins@anthropic.com"
+  },
   "plugins": [
     {
       "name": "prompt-orchestrator",
-      "source": "plugins/prompt-orchestrator",
+      "source": "./plugins/prompt-orchestrator",
       "description": "Two-tier prompt orchestration: Haiku for discovery/refinement, Sonnet/Opus for execution. Uncovers real problems through Socratic questioning, refines context, and optimizes prompts before expensive model execution. Saves 60-80% on clarification costs.",
       "version": "2.0.0",
-      "author": "Engineering Team",
+      "author": {
+        "name": "Engineering Team",
+        "email": "team@example.com"
+      },
       "category": "productivity"
     },
     {
       "name": "marketplace-manager",
-      "source": "plugins/marketplace-manager",
+      "source": "./plugins/marketplace-manager",
       "description": "Create, validate, and manage plugins in Claude Code plugin marketplaces. Includes scaffolding, validation, and documentation generation.",
       "version": "1.0.0",
-      "author": "Anthropic",
+      "author": {
+        "name": "Anthropic",
+        "email": "plugins@anthropic.com"
+      },
       "category": "development"
     },
     {
       "name": "day-week-planner",
-      "source": "plugins/planner",
+      "source": "./plugins/planner",
       "description": "Interactive day and week planning with Eisenhower matrix prioritization, time-blocking, and Jira/GitHub integration",
       "version": "1.0.0",
-      "author": "Planning Team",
+      "author": {
+        "name": "Planning Team",
+        "email": "support@example.com"
+      },
       "category": "productivity"
     }
   ]
