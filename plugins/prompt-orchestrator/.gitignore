@@ -7,6 +7,9 @@ state/discovery-log.md
 
 # User project state files (always-on orchestration)
 .claude/prompt-orchestrator/
+# Ignore JSON files except plugin.json and hooks.json which are tracked
+!plugin.json
+!hooks.json
 *.json
 
 # Hook runtime files

@@ -1,0 +1,19 @@
+{
+  "name": "prompt-orchestrator",
+  "version": "2.0.0",
+  "description": "Two-tier prompt orchestration: Haiku for discovery/refinement, Sonnet/Opus for execution. Uncovers real problems through Socratic questioning, refines context, and optimizes prompts before expensive model execution. Saves 60-80% on clarification costs.",
+  "author": {
+    "name": "Engineering Team",
+    "email": "team@example.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "prompt-orchestration",
+    "cost-optimization",
+    "model-selection",
+    "quality-assessment",
+    "haiku",
+    "sonnet",
+    "opus"
+  ]
+}

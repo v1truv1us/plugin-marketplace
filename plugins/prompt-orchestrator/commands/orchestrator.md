@@ -1,3 +1,8 @@
+---
+name: orchestrator
+description: Control prompt-orchestrator always-on mode and quality gates
+---
+
 # Orchestrator Control
 
 Control the prompt-orchestrator plugin's always-on mode and settings.
