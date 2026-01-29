@@ -212,13 +212,14 @@ When designing subagents for distribution via plugin marketplaces:
 
 **Versioning Strategy:**
 - Use semantic versioning for your plugin
-- Update plugin.json version when subagents change
+- Update plugin.json and marketplace.json version when subagents change
 - Document breaking changes in plugin README
 
-**Marketplace Synchronization:**
-- When distributing, maintain both marketplace.json and .claude-plugin/marketplace.json
-- These files must stay in sync for proper distribution
-- See Marketplace Resources section for detailed guidance
+**Marketplace Registration:**
+- Register plugins in `.claude-plugin/marketplace.json` (this is THE file Claude Code reads)
+- Include: name, source, description, version, author
+- Validate with `/validate-marketplace . --deep`
+- Test locally before publishing
 
 For marketplace registration best practices, see:
 - **Anthropic Documentation:** [Create and Distribute a Plugin Marketplace](https://code.claude.com/docs/en/plugin-marketplaces#create-and-distribute-a-plugin-marketplace)

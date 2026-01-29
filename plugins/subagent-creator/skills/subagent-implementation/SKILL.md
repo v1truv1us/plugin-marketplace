@@ -370,56 +370,78 @@ When you've created and tested subagents, you can package them in a Claude Code 
 
 ### Plugin Structure for Subagents
 
-To distribute subagents:
+To distribute subagents, create a plugin repository with:
 
-1. **Create a Claude Code plugin** with agents/ directory
-2. **Add plugin.json** manifest defining your agents
-3. **Register in marketplace.json** for discoverability
-4. **Maintain .claude-plugin/marketplace.json** for distribution sync
+1. **`.claude-plugin/marketplace.json`** - Marketplace manifest (THE file Claude Code reads)
+2. **`.claude-plugin/plugin.json`** - Plugin manifest in each plugin directory
+3. **`agents/`** - Directory containing your subagent files
 
 ```
 my-subagent-plugin/
-├── plugin.json                          # Plugin manifest
-├── agents/
-│   ├── agent-one.md                    # Your subagents
-│   └── agent-two.md
 ├── .claude-plugin/
-│   └── plugin.json                     # Deployment manifest
+│   ├── marketplace.json                # Marketplace entry for your plugins
+│   └── plugin.json                     # Plugin manifest (if this is also a plugin)
+├── plugins/
+│   └── my-subagent-plugin/
+│       ├── .claude-plugin/
+│       │   └── plugin.json             # Plugin definition
+│       ├── agents/
+│       │   ├── agent-one.md            # Your subagents
+│       │   └── agent-two.md
+│       └── README.md
 └── README.md
 ```
 
 ### Marketplace Registration
 
-Plugin marketplaces require synchronization between:
-- **marketplace.json** - Primary registry of all plugins
-- **.claude-plugin/marketplace.json** - Deployed version for distribution
+To register plugins in a marketplace, add an entry to `.claude-plugin/marketplace.json`:
 
-**Important:** Keep both files in sync. Each marketplace entry must include:
-- Plugin name and version
-- Source path to agent files
-- Clear description of agent capabilities
-- Author information
+```json
+{
+  "name": "my-marketplace",
+  "owner": {
+    "name": "Your Team"
+  },
+  "plugins": [
+    {
+      "name": "my-subagent-plugin",
+      "source": "./plugins/my-subagent-plugin",
+      "description": "Subagent for specialized task handling",
+      "version": "1.0.0",
+      "author": {
+        "name": "Your Team"
+      }
+    }
+  ]
+}
+```
+
+**Key points:**
+- `.claude-plugin/marketplace.json` is THE ONLY file Claude Code reads for plugin discovery
+- Each plugin entry should include: name, source, description, version, and author
+- Test your marketplace locally before distribution
 
 ### Resources
 
 For comprehensive guidance on creating and distributing plugins via marketplaces, see:
 - **Anthropic Documentation:** [Create and Distribute a Plugin Marketplace](https://code.claude.com/docs/en/plugin-marketplaces#create-and-distribute-a-plugin-marketplace)
-- Key topics: marketplace structure, plugin registration, best practices for distribution
+- **Marketplace Guide:** Local documentation in marketplace-manager plugin
 
 ### Best Practices
 
 ✅ **DO:**
-- Keep marketplace registries synchronized
-- Include agent purpose in description
+- Validate marketplace with `/validate-marketplace . --deep`
+- Include agent purpose in plugin description
 - Test agent triggering conditions before distribution
 - Document agent capabilities in README
 - Version your plugins semantically
+- Commit and push to git for distribution
 
 ❌ **DON'T:**
-- Forget to update both marketplace.json files
 - Leave agent descriptions vague
 - Skip testing before publishing
 - Hardcode paths in agent definitions
+- Forget to validate before pushing changes
 
 ## Additional Resources
 
