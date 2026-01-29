@@ -47,6 +47,19 @@
       "category": "development",
       "keywords": ["prompt-orchestration", "cost-optimization", "model-selection", "quality-assessment"],
       "repository": "https://github.com/anthropics/prompt-orchestrator"
+    },
+    {
+      "name": "subagent-creator",
+      "source": "./plugins/subagent-creator",
+      "description": "Interactive plugin for creating, designing, and implementing custom subagents in Claude Code with guided best practices",
+      "version": "0.1.0",
+      "author": {
+        "name": "Claude Code Community",
+        "email": "support@anthropic.com"
+      },
+      "category": "development",
+      "keywords": ["subagents", "agent-creation", "agent-design", "workflow-automation"],
+      "repository": "https://github.com/anthropics/claude-code"
     }
   ]
 }
