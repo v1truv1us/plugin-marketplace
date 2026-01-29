@@ -170,11 +170,11 @@ validate_plugin_sources() {
 
             # Check if path exists
             if [ -d "$FULL_PATH" ]; then
-                # Check if plugin.json exists
-                if [ -f "$FULL_PATH/.claude-plugins/plugin.json" ]; then
+                # Check if plugin.json exists (check both root and .claude-plugin locations)
+                if [ -f "$FULL_PATH/plugin.json" ] || [ -f "$FULL_PATH/.claude-plugin/plugin.json" ]; then
                     print_check "Local plugin source valid: $PLUGIN_NAME → $SOURCE"
                 else
-                    print_error "Plugin $PLUGIN_NAME source missing plugin.json"
+                    print_error "Plugin $PLUGIN_NAME source missing plugin.json (should be at root or .claude-plugin/)"
                 fi
             else
                 print_error "Local source path not found: $SOURCE"
@@ -203,8 +203,12 @@ validate_plugin_structures() {
             PLUGIN_DIR="$SOURCE"
         fi
 
-        # Run plugin validation if script exists
-        PLUGIN_JSON="$PLUGIN_DIR/.claude-plugins/plugin.json"
+        # Check for plugin.json (check both root and .claude-plugin locations)
+        PLUGIN_JSON="$PLUGIN_DIR/plugin.json"
+        if [ ! -f "$PLUGIN_JSON" ]; then
+            PLUGIN_JSON="$PLUGIN_DIR/.claude-plugin/plugin.json"
+        fi
+
         if [ -f "$PLUGIN_JSON" ]; then
             # Extract and validate basic fields
             P_NAME=$(jq -r '.name // empty' "$PLUGIN_JSON")
@@ -217,6 +221,8 @@ validate_plugin_structures() {
                 print_check "Plugin validated: $PLUGIN_NAME v$P_VERSION"
                 ((PLUGINS_VALIDATED++))
             fi
+        else
+            print_warning "plugin.json not found for $PLUGIN_NAME at $PLUGIN_DIR"
         fi
     done
 }
@@ -240,6 +246,61 @@ validate_documentation() {
     else
         print_warning "README.md not found in marketplace directory"
     fi
+}
+
+validate_marketplace_sync() {
+    print_header "Marketplace Synchronization"
+
+    CLAUDE_PLUGIN_MARKETPLACE="$MARKETPLACE_PATH/.claude-plugin/marketplace.json"
+
+    # Check if .claude-plugin/marketplace.json exists
+    if [ ! -f "$CLAUDE_PLUGIN_MARKETPLACE" ]; then
+        print_warning ".claude-plugin/marketplace.json not found (optional for development)"
+        return 0
+    fi
+
+    print_check ".claude-plugin/marketplace.json found"
+
+    # Validate JSON
+    if ! jq empty "$CLAUDE_PLUGIN_MARKETPLACE" 2>/dev/null; then
+        print_error ".claude-plugin/marketplace.json is not valid JSON"
+        return 1
+    fi
+
+    # Extract plugin names from both files
+    MAIN_PLUGINS=$(jq -r '.plugins[] | .name' "$MARKETPLACE_FILE" | sort)
+    PLUGIN_PLUGINS=$(jq -r '.plugins[] | .name' "$CLAUDE_PLUGIN_MARKETPLACE" | sort)
+
+    # Compare plugin lists
+    if [ "$MAIN_PLUGINS" != "$PLUGIN_PLUGINS" ]; then
+        print_warning "Marketplace files out of sync"
+
+        # Find missing plugins in .claude-plugin/marketplace.json
+        MISSING=$(comm -23 <(echo "$MAIN_PLUGINS") <(echo "$PLUGIN_PLUGINS") | tr '\n' ',')
+        if [ -n "$MISSING" ]; then
+            print_error "Missing in .claude-plugin/marketplace.json: ${MISSING%,}"
+        fi
+
+        # Find extra plugins in .claude-plugin/marketplace.json
+        EXTRA=$(comm -13 <(echo "$MAIN_PLUGINS") <(echo "$PLUGIN_PLUGINS") | tr '\n' ',')
+        if [ -n "$EXTRA" ]; then
+            print_warning "Extra in .claude-plugin/marketplace.json: ${EXTRA%,}"
+        fi
+
+        return 1
+    else
+        print_check "Plugin lists are synchronized between marketplace.json and .claude-plugin/marketplace.json"
+    fi
+
+    # Verify all entries have matching metadata
+    jq -r '.plugins[] | .name' "$MARKETPLACE_FILE" | while read -r PLUGIN_NAME; do
+        MAIN_VERSION=$(jq -r ".plugins[] | select(.name == \"$PLUGIN_NAME\") | .version // \"\"" "$MARKETPLACE_FILE")
+        PLUGIN_VERSION=$(jq -r ".plugins[] | select(.name == \"$PLUGIN_NAME\") | .version // \"\"" "$CLAUDE_PLUGIN_MARKETPLACE")
+
+        if [ "$MAIN_VERSION" != "$PLUGIN_VERSION" ]; then
+            print_warning "Version mismatch for $PLUGIN_NAME: marketplace=$MAIN_VERSION, .claude-plugin=$PLUGIN_VERSION"
+        fi
+    done
 }
 
 print_summary() {
@@ -304,6 +365,7 @@ main() {
     validate_plugin_sources
     validate_plugin_structures
     validate_documentation
+    validate_marketplace_sync
 
     # Print summary and exit
     print_summary
