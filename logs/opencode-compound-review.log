@@ -1,0 +1,14 @@
+=== Compound Review Started: 2026-01-29 21:04:12 ===
+Already on 'main'
+M	.claude-plugin/marketplace.json
+M	README.md
+M	plugins/plugin-improver/skills/architecture-patterns.md
+M	plugins/plugin-improver/skills/best-practices-reference.md
+M	plugins/plugin-improver/skills/prompt-enhancement.md
+M	plugins/prompt-orchestrator/agents/problem-discovery-agent.md
+Your branch is up to date with 'origin/main'.
+ssh: connect to host github.com port 22: Network is unreachable
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.

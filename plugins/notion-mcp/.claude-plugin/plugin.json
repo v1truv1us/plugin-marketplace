@@ -1,0 +1,13 @@
+{
+  "name": "notion-mcp",
+  "version": "0.1.0",
+  "description": "Read and write to Notion documents using the official Notion MCP server with OAuth authentication",
+  "author": {
+    "name": "Claude Code Plugin Developer",
+    "email": "dev@example.com"
+  },
+  "license": "MIT",
+  "keywords": ["notion", "mcp", "integration", "database", "documents"],
+  "homepage": "https://developers.notion.com/guides/mcp/mcp",
+  "repository": "https://github.com/your-org/notion-mcp-plugin"
+}

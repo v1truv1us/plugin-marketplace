@@ -73,6 +73,19 @@
       "category": "development",
       "keywords": ["plugin-improvement", "quality-assessment", "best-practices", "prompt-optimization", "iterative-enhancement", "continuous-improvement"],
       "repository": "https://github.com/anthropics/claude-code-plugins"
+    },
+    {
+      "name": "notion-mcp",
+      "source": "./plugins/notion-mcp",
+      "description": "Read and write to Notion documents using the official Notion MCP server with OAuth authentication. Provides secure commands for reading, writing, searching, and querying Notion pages and databases.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Claude Code Plugin Developer",
+        "email": "dev@example.com"
+      },
+      "category": "integration",
+      "keywords": ["notion", "mcp", "integration", "database", "documents", "oauth", "productivity"],
+      "repository": "https://github.com/anthropics/claude-code-plugins"
     }
   ]
 }

@@ -1,0 +1,181 @@
+#!/bin/bash
+# scripts/opencode-auto-compound.sh
+# Full pipeline: report → PRD → tasks → implementation → PR
+# Uses OpenCode harness with gpt-5.2 (latest OpenAI model) for implementation
+#
+# Usage:
+#   ./scripts/opencode-auto-compound.sh              # Uses current directory
+#   ./scripts/opencode-auto-compound.sh /path/to/repo  # Uses specified directory
+#   opencode-auto-compound.sh ~/git/my-project       # Works from anywhere
+
+set -e
+
+# Determine working directory
+if [ -n "$1" ]; then
+  # Directory argument provided
+  TARGET_DIR="$1"
+else
+  # Use current directory
+  TARGET_DIR="."
+fi
+
+# Resolve to absolute path
+TARGET_DIR="$(cd "$TARGET_DIR" 2>/dev/null && pwd)" || {
+  echo "Error: Cannot access directory: $1"
+  exit 1
+}
+
+cd "$TARGET_DIR"
+
+# Load environment from various possible locations
+if [ -f .env.local ]; then
+  source .env.local
+elif [ -f ~/.config/opencode-compound/environment.conf ]; then
+  source ~/.config/opencode-compound/environment.conf
+fi
+
+# Ensure Discord webhook is set
+if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+  echo "Error: DISCORD_WEBHOOK_URL not set in .env.local"
+  exit 1
+fi
+
+PROJECT_NAME="${PROJECT_NAME:-plugin-marketplace}"
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+LOG_FILE="logs/opencode-auto-compound.log"
+
+# Create logs directory if it doesn't exist
+mkdir -p logs
+
+# Function to send Discord notification
+send_discord_notification() {
+  local title="$1"
+  local description="$2"
+  local color="$3"
+  local fields="$4"
+
+  curl -X POST "$DISCORD_WEBHOOK_URL" \
+    -H 'Content-Type: application/json' \
+    -d "{
+      \"embeds\": [{
+        \"title\": \"$title\",
+        \"description\": \"$description\",
+        \"color\": $color,
+        $fields
+        \"timestamp\": \"$(date -Iseconds)\"
+      }]
+    }" 2>/dev/null || true
+}
+
+{
+  echo "=== Auto-Compound Started: $TIMESTAMP ==="
+
+  # Fetch latest (including tonight's CLAUDE.md updates)
+  git fetch origin main
+  git reset --hard origin/main
+
+  # Send notification: starting implementation
+  send_discord_notification \
+    "🚀 Auto-Compound Starting" \
+    "Fetching latest code and analyzing priority items" \
+    3447003 \
+    '"fields": [{"name": "Project", "value": "'$PROJECT_NAME'", "inline": true}, {"name": "Phase", "value": "Analysis", "inline": true}],'
+
+  # Find the latest priority report
+  if [ ! -d "reports" ]; then
+    echo "Warning: no reports directory found, skipping priority analysis"
+    PRIORITY_ITEM="next scheduled feature implementation"
+    BRANCH_NAME="feature/auto-compound-$(date +%s)"
+  else
+    LATEST_REPORT=$(ls -t reports/*.md 2>/dev/null | head -1 || echo "")
+
+    if [ -z "$LATEST_REPORT" ]; then
+      echo "Warning: no priority reports found"
+      PRIORITY_ITEM="next scheduled feature implementation"
+      BRANCH_NAME="feature/auto-compound-$(date +%s)"
+    else
+      # Analyze report and extract priority (simplified for this implementation)
+      PRIORITY_ITEM=$(head -20 "$LATEST_REPORT" | grep -i "priority\|todo\|implement" | head -1 || echo "next feature")
+      BRANCH_NAME="feature/$(date +%Y%m%d-%H%M%S)"
+
+      echo "Latest report: $LATEST_REPORT"
+      echo "Extracted priority: $PRIORITY_ITEM"
+    fi
+  fi
+
+  # Create feature branch
+  git checkout -b "$BRANCH_NAME"
+
+  # Send notification: analyzing priority
+  send_discord_notification \
+    "📋 Priority Item Identified" \
+    "$PRIORITY_ITEM" \
+    3447003 \
+    '"fields": [{"name": "Branch", "value": "'$BRANCH_NAME'", "inline": true}],'
+
+  # Run OpenCode to create PRD and implement
+  # Using gpt-5.2 (latest OpenAI model) for implementation
+  echo "Starting OpenCode implementation with gpt-5.2..."
+
+  opencode --model gpt-5.2 --skip-plan "Load the project CLAUDE.md to understand context. Create a comprehensive PRD for: $PRIORITY_ITEM. Break down the implementation into clear, testable steps. Then implement each step, ensuring code follows project patterns. After implementation, create appropriate tests. When complete, provide a summary of changes made."
+
+  IMPL_STATUS=$?
+
+  if [ $IMPL_STATUS -eq 0 ]; then
+    # Commit changes
+    git add -A
+    git commit -m "feat: $PRIORITY_ITEM
+
+Implemented via OpenCode auto-compound workflow
+- Created PRD from priority report
+- Implemented feature following project patterns
+- Added tests for new functionality
+
+Workflow: compound review → priority extraction → implementation → PR"
+
+    # Push to remote
+    git push -u origin "$BRANCH_NAME"
+
+    # Create PR
+    PR_URL=$(gh pr create --draft --title "Compound: $PRIORITY_ITEM" --base main --body "## Auto-Compound Implementation
+
+**Priority Item:** $PRIORITY_ITEM
+
+**Branch:** $BRANCH_NAME
+
+**Workflow:** This PR was automatically created by the OpenCode compound workflow:
+1. Daily learnings were extracted into CLAUDE.md
+2. Priority item was identified from reports
+3. Feature was implemented with gpt-5.2 model
+4. Tests were added
+
+**Status:** Ready for review (draft mode)
+
+---
+Generated by: OpenCode Compound Workflow
+Timestamp: $TIMESTAMP" 2>/dev/null || echo "https://github.com/vitruvius/plugin-marketplace/pulls")
+
+    STATUS_COLOR=3066993 # Green
+    STATUS_EMOJI="✅"
+    STATUS_TEXT="Implementation completed and PR created"
+    STATUS_DETAILS="\"fields\": [{\"name\": \"Branch\", \"value\": \"$BRANCH_NAME\", \"inline\": true}, {\"name\": \"PR URL\", \"value\": \"$PR_URL\", \"inline\": true}],"
+  else
+    STATUS_COLOR=15158332 # Red
+    STATUS_EMOJI="❌"
+    STATUS_TEXT="Implementation failed (exit code: $IMPL_STATUS)"
+    STATUS_DETAILS="\"fields\": [{\"name\": \"Branch\", \"value\": \"$BRANCH_NAME\", \"inline\": true}],"
+  fi
+
+  # Send completion notification
+  send_discord_notification \
+    "$STATUS_EMOJI Auto-Compound Complete" \
+    "$STATUS_TEXT" \
+    $STATUS_COLOR \
+    "$STATUS_DETAILS"
+
+  echo "=== Auto-Compound Completed: $TIMESTAMP ==="
+  exit $IMPL_STATUS
+
+} 2>&1 | tee -a "$LOG_FILE"
+
+exit ${PIPESTATUS[0]}

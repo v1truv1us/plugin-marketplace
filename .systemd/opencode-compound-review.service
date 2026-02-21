@@ -1,0 +1,31 @@
+[Unit]
+Description=OpenCode Compound Review - Extract learnings from daily threads
+Documentation=file:///home/vitruvius/git/plugin-marketplace/OPENCODE_WORKFLOW_SETUP.md
+Wants=opencode-auto-compound.service
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=vitruvius
+# Scripts accept directory as argument, no WorkingDirectory needed
+ExecStart=/home/vitruvius/git/plugin-marketplace/bin/opencode-compound-review /home/vitruvius/git/plugin-marketplace
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=opencode-review
+
+# Environment file should contain DISCORD_WEBHOOK_URL and PROJECT_NAME
+EnvironmentFile=%h/.config/opencode-compound/environment.conf
+
+# Timeout - give it 30 minutes to complete
+TimeoutStartSec=1800
+
+# Run at 10:30 PM every day
+OnCalendar=*-*-* 22:30:00
+Persistent=true
+
+# Restart on failure
+Restart=on-failure
+RestartSec=300
+
+[Install]
+WantedBy=timers.target

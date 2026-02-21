@@ -514,6 +514,111 @@ To contribute a plugin to this marketplace:
    - Include your plugin source code
    - Add any new contributing guidelines
 
+## 🌙 OpenCode Compound Workflow
+
+Automated nightly AI agent loop: learns from your work, updates documentation, and ships features while you sleep.
+
+**Status:** ✅ Ready to install and run
+
+Based on Ryan Carson's compound engineering pattern, adapted for OpenCode harness with integrated Discord notifications.
+
+### What It Does
+
+Every night, two jobs run automatically:
+
+- **10:30 PM** - Compound Review: Review 24-hour work, extract learnings, update CLAUDE.md
+- **11:00 PM** - Auto-Compound: Implement next priority, create PR, send Discord notification
+
+After one week, your agent becomes specialized in your codebase.
+
+### Quick Start (5 Minutes)
+
+```bash
+# 1. Create config directory
+mkdir -p ~/.config/opencode-compound
+
+# 2. Copy environment template
+cp opencode-workflow/environment.sample \
+   ~/.config/opencode-compound/environment.conf
+# Edit with Discord webhook URL and GitHub token
+
+# 3. Secure it
+chmod 600 ~/.config/opencode-compound/environment.conf
+
+# 4. Install systemd services
+mkdir -p ~/.config/systemd/user
+cp .systemd/opencode-*.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable opencode-*.service
+
+# 5. Test manually
+./scripts/opencode-compound-review.sh
+./scripts/opencode-auto-compound.sh
+
+# 6. Verify scheduling
+systemctl --user list-timers | grep opencode
+```
+
+### Documentation
+
+- **START_HERE.md** - Entry point with three setup paths (5 min, 45 min, 60 min)
+- **OPENCODE_QUICK_START.md** - 5-minute setup guide
+- **OPENCODE_README.md** - Main overview and reference
+- **OPENCODE_WORKFLOW_SETUP.md** - Complete technical documentation
+- **OPENCODE_WORKFLOW_SUMMARY.md** - What was built and how it works
+- **WORKFLOW_VERIFICATION.md** - Verification checklist for quality assurance
+- **ryan-carson-article-x.md** - Original concept and article
+
+### Files
+
+```
+scripts/
+├── opencode-compound-review.sh     # Review & extract learnings (10:30 PM)
+└── opencode-auto-compound.sh       # Implement features & create PRs (11:00 PM)
+
+.systemd/
+├── opencode-compound-review.service
+├── opencode-auto-compound.service
+└── environment.sample
+
+opencode-workflow/
+└── environment.sample              # Copy to ~/.config/opencode-compound/
+```
+
+### Features
+
+✅ Integrates with your Discord webhook from ai-eng setup
+✅ Uses OpenCode harness with gpt-5.2 for implementation
+✅ Uses efficient analysis model for pattern extraction
+✅ Automatic systemd scheduling (Linux)
+✅ Full error handling and logging
+✅ Git-based workflow with PR creation
+
+### Expected Results
+
+**First Night:** CLAUDE.md updated + draft PR with implemented feature
+
+**After One Week:** Agent becomes specialized, implementation quality improves daily
+
+**Ongoing:** Each day benefits from accumulated knowledge
+
+### Installation Paths
+
+Choose what works for you:
+
+- **Path A (15 min):** Just get it running → `OPENCODE_QUICK_START.md`
+- **Path B (60 min):** Understand concept first → `ryan-carson-article-x.md`
+- **Path C (45 min):** Full verification → Follow A then `WORKFLOW_VERIFICATION.md`
+
+### Next Steps
+
+1. Read: `START_HERE.md`
+2. Follow your chosen path
+3. Let it run tonight at 10:30 PM and 11:00 PM
+4. Check Discord for notifications in the morning
+
+---
+
 ## 📄 License
 
 All plugins in this marketplace are licensed under MIT License unless otherwise specified.

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "notion": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@notionhq/mcp"],
+      "env": {
+        "NOTION_API_TOKEN": "${NOTION_MCP_TOKEN}",
+        "NOTION_WORKSPACE_ID": "${NOTION_MCP_WORKSPACE_ID}"
+      }
+    }
+  },
+  "tokenSource": ".claude/notion-mcp.local.md"
+}

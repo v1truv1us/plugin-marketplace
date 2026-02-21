@@ -1,0 +1,30 @@
+[Unit]
+Description=OpenCode Auto-Compound - Implement priority items and create PRs
+Documentation=file:///home/vitruvius/git/plugin-marketplace/OPENCODE_WORKFLOW_SETUP.md
+After=network-online.target opencode-compound-review.service
+
+[Service]
+Type=oneshot
+User=vitruvius
+# Scripts accept directory as argument, no WorkingDirectory needed
+ExecStart=/home/vitruvius/git/plugin-marketplace/bin/opencode-auto-compound /home/vitruvius/git/plugin-marketplace
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=opencode-compound
+
+# Environment file should contain DISCORD_WEBHOOK_URL, PROJECT_NAME, and GitHub token
+EnvironmentFile=%h/.config/opencode-compound/environment.conf
+
+# Timeout - give it 45 minutes to complete
+TimeoutStartSec=2700
+
+# Run at 11:00 PM every day
+OnCalendar=*-*-* 23:00:00
+Persistent=true
+
+# Restart on failure
+Restart=on-failure
+RestartSec=300
+
+[Install]
+WantedBy=timers.target

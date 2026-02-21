@@ -1,0 +1,15 @@
+#!/bin/bash
+# Wrapper script for opencode-compound-review
+# Can be called from anywhere with optional directory argument
+#
+# Usage:
+#   opencode-compound-review                      # Uses current directory
+#   opencode-compound-review /path/to/repo        # Uses specified directory
+#   opencode-compound-review ~/git/my-project     # Absolute or relative paths work
+
+# Get the directory where this wrapper script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Execute the actual script with the arguments
+"$PROJECT_ROOT/scripts/opencode-compound-review.sh" "$@"

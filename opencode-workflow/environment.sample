@@ -1,0 +1,28 @@
+# OpenCode Compound Workflow Environment Configuration
+# Copy this to ~/.config/opencode-compound/environment.conf and fill in your values
+# DO NOT commit the actual environment.conf file to git
+
+# Discord webhook URL from your ai-eng setup
+# Get this from: https://discord.com/developers/applications
+DISCORD_WEBHOOK_URL=https://discordapp.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
+
+# Project identifier for Discord notifications
+PROJECT_NAME=plugin-marketplace
+
+# GitHub token for creating PRs
+# Generate at: https://github.com/settings/tokens
+# Required scopes: repo (full control of private repositories)
+GITHUB_TOKEN=github_pat_XXXXXXXXXXXXXXX
+
+# OpenCode models to use
+# Compound review uses: big-p model (faster analysis)
+# Auto-compound implementation uses: gpt-5.2 (latest OpenAI model)
+OPENCODE_REVIEW_MODEL=big-p
+OPENCODE_IMPL_MODEL=gpt-5.2
+
+# Optional: API keys if not using system default configuration
+# OPENAI_API_KEY=sk-XXXXXXXXXXXXXXX
+# ANTHROPIC_API_KEY=sk-ant-XXXXXXXXXXXXXXX
+
+# Optional: Set to 'true' to enable verbose logging
+DEBUG=false

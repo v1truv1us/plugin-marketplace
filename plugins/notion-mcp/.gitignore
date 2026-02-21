@@ -1,0 +1,10 @@
+# Notion MCP local configuration with OAuth token
+.claude/notion-mcp.local.md
+
+# General
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

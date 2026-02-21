@@ -1,0 +1,14 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": ".*notion.*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Before executing any Notion MCP tool, validate that the OAuth token exists and is properly configured:\n\n1. Check if .claude/notion-mcp.local.md exists\n2. Parse the YAML frontmatter to extract the notion_oauth_token\n3. Verify token is not empty and starts with 'notion_oauth_'\n4. If token is invalid or missing:\n   - Block the tool execution\n   - Return clear error message\n   - Suggest running /notion:setup to authenticate\n5. If token is valid:\n   - Extract workspace_id\n   - Allow tool to proceed\n   - Token will be provided to MCP server via environment variables\n\nNever log or display the actual token value in any messages.",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
+}

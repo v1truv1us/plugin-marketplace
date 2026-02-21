@@ -1,0 +1,15 @@
+#!/bin/bash
+# Wrapper script for opencode-auto-compound
+# Can be called from anywhere with optional directory argument
+#
+# Usage:
+#   opencode-auto-compound                      # Uses current directory
+#   opencode-auto-compound /path/to/repo        # Uses specified directory
+#   opencode-auto-compound ~/git/my-project     # Absolute or relative paths work
+
+# Get the directory where this wrapper script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Execute the actual script with the arguments
+"$PROJECT_ROOT/scripts/opencode-auto-compound.sh" "$@"
